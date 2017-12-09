@@ -28,4 +28,4 @@ class DynamicButton(object):
             screen.blit(self.button_2, self.position)
         else:
             screen.blit(self.button_1, self.position)
-        return self.position, [self.button_1.get_width(), self.button_1.get_height()]
+        return

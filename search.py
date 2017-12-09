@@ -62,7 +62,7 @@ class Agent(object):
 
 
 class PuzzleMap(object):
-    def __init__(self, M, N, cat_init, mouse_init, grid, level):
+    def __init__(self, M=6, N=7, cat_init=[1, 3], mouse_init=[5, 2], grid='square', level=1):
         self.M = M
         self.N = N
         self.puzzle_map = np.zeros((self.M, self.N), dtype=np.int)
@@ -70,6 +70,7 @@ class PuzzleMap(object):
         self.mouse_init = mouse_init
         self.grid = grid
         self.level = level
+        self.obstacle = [[1, 4], [3, 1], [3, 2], [3, 3], [3, 4]]
         return
 
     def map_generator(self):
@@ -80,10 +81,7 @@ class PuzzleMap(object):
         return
 
     def obstacle_generator(self):
-        self.puzzle_map[1, 4] = 1
-        self.puzzle_map[3, 1] = 1
-        self.puzzle_map[3, 2] = 1
-        self.puzzle_map[3, 3] = 1
-        self.puzzle_map[3, 4] = 1
+        for i in self.obstacle:
+            self.puzzle_map[i] = 1
 
         return
