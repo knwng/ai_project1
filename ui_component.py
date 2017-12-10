@@ -25,7 +25,7 @@ class DynamicButton(object):
         return True
 
     def display(self, screen):
-        pygame.draw.rect(screen, WHITE, (*self.position, *self.shape))
+        pygame.draw.rect(screen, WHITE, (self.position[0], self.position[1], self.shape[0], self.shape[1]))
         if self.mouse_on_button() is True:
             screen.blit(self.button_2, self.position)
         else:
