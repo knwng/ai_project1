@@ -2,9 +2,7 @@ import numpy as np
 from queue import PriorityQueue
 import pygame
 import time
-
-CORNFLOWERBLUE = (100, 149, 237, 128)
-BLUEVIOLET = (138, 43, 226, 128)
+from color_map import *
 
 FPS = 30
 

@@ -2,14 +2,11 @@ import pygame
 import sys
 from pygame.locals import *
 import pygame.mixer
+import time
 from ui_component import *
 from search import *
-import time
+from color_map import *
 
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
 
 pygame.init()
 
