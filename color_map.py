@@ -1,4 +1,3 @@
-
 CORNFLOWERBLUE = (100, 149, 237, 128)
 BLUEVIOLET = (138, 43, 226, 128)
 WHITE = (255, 255, 255)
@@ -12,5 +11,6 @@ grass_fn = './img/map_block_grass.gif'
 stone_fn = './img/map_block_stone.gif'
 startpage_fn = './img/startpage.jpg'
 start_button_fn = ['./img/start_button_1.gif', './img/start_button_2.gif']
-play_button_fn = ['./img/button_green.jpg', './img/button_yellow.jpg']
+play_button_fn = ['./img/button_gray.jpg', './img/button_green.jpg']
+restart_button_fn = ['./img/button_restart_gray.png', './img/button_restart_green.png']
 catchpage_fn = './img/catched.jpg'

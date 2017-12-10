@@ -8,6 +8,8 @@ class DynamicButton(object):
     def __init__(self, button_fn_1, button_fn_2, position):
         self.button_1 = pygame.image.load(button_fn_1).convert_alpha()
         self.button_2 = pygame.image.load(button_fn_2).convert_alpha()
+        self.button_1.set_colorkey(WHITE)
+        self.button_2.set_colorkey(WHITE)
         self.position = position
         self.shape = [self.button_1.get_width(), self.button_1.get_height()]
         print('button range: ')

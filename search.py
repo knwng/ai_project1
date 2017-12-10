@@ -32,6 +32,7 @@ class Agent(object):
         orient = [[0, 1], [1, 0], [0, -1], [-1, 0]]
         self.open_list = PriorityQueue()
         self.close_list = {}
+        self.last_node = []
         self.path = []
         self.open_list.put(self.NextNode(self.cat_init, 1, self.mouse_init))
         parents = {}
@@ -42,6 +43,7 @@ class Agent(object):
             pygame.event.pump()
             node = self.open_list.get()
             if self.puzzle_map[node.node[0], node.node[1]] == -1:
+                self.display(screen, block_lt_pos, block_shape)
                 print("catch the mouse!")
                 node_backtrack = node.node
                 self.path.append(node_backtrack)
@@ -50,9 +52,11 @@ class Agent(object):
                     node_backtrack = parents[str(node_backtrack)]
                 self.path.reverse()
                 self.SOLVED = True
+                time.sleep(1)
                 self.display(screen, block_lt_pos, block_shape)
                 break
             self.close_list[str(node.node)] = node.node
+            self.last_node = node.node
             self.display(screen, block_lt_pos, block_shape)
             for i in range(4):
                 # nnode = map(add, node.node, orient[i])
@@ -62,7 +66,6 @@ class Agent(object):
                     parents[str(nnode)] = node.node
             # time.sleep(1./FPS)
             # time.sleep(1)
-        print("Path: ", self.path)
         return
 
     def is_legal(self, node, close_list):
@@ -76,42 +79,41 @@ class Agent(object):
         return True
 
     def display(self, screen, block_lt_pos, block_shape):
-        self.pmap.display(screen)
+        # self.pmap.display(screen)
         block = pygame.Surface(block_shape, flags=pygame.SRCALPHA)
         block.convert_alpha()
         if self.SOLVED is False:
-            print('close list: ', self.close_list.keys())
+            # print('close list: ', self.close_list.keys())
             block.fill(CORNFLOWERBLUE)
-            for k, v in self.close_list.iteritems():
-                lt_pos = [block_lt_pos[0]+v[0]*block_shape[0], block_lt_pos[1]+v[1]*block_shape[1]]
-                screen.blit(block, lt_pos)
-                pygame.display.update()
-                time.sleep(1./FPS)
+            lt_pos = [block_lt_pos[0] + self.last_node[0] * block_shape[0], block_lt_pos[1] + self.last_node[1] * block_shape[1]]
+            screen.blit(block, lt_pos)
+            pygame.display.update()
+            time.sleep(1./FPS)
 
         else:
-            pygame.display.flip()
             block.fill(BLUEVIOLET)
-            for i in self.path:
-                lt_pos = [block_lt_pos[0]+i[0]*block_shape[0], block_lt_pos[1]+i[1]*block_shape[1]]
-                screen.blit(block, lt_pos)
-                pygame.display.update()
-                time.sleep(1./FPS)
+            # print("Path: ", self.path)
+            # self.pmap.display(screen)
+            # pygame.event.pump()
+            # for i in self.path:
+            #     lt_pos = [block_lt_pos[0]+i[0]*block_shape[0], block_lt_pos[1]+i[1]*block_shape[1]]
+            #     screen.blit(block, lt_pos)
+            # pygame.display.update()
             time.sleep(1)
             cat_head = pygame.image.load(cat_fn).convert_alpha()
             grass_block = pygame.image.load(grass_fn).convert_alpha()
             grass_block = pygame.transform.scale(grass_block, (cat_head.get_width(), cat_head.get_height()))
             for i in range(len(self.path)):
+                pygame.event.pump()
                 if i == 0:
                     continue
                 lt_pos_post = [block_lt_pos[0]+self.path[i-1][0]*block_shape[0], block_lt_pos[1]+self.path[i-1][1]*block_shape[1]]
                 lt_pos_curr = [block_lt_pos[0]+self.path[i][0]*block_shape[0], block_lt_pos[1]+self.path[i][1]*block_shape[1]]
-                screen.blit(block, lt_pos_post)
                 screen.blit(grass_block, lt_pos_post)
+                screen.blit(block, lt_pos_post)
                 screen.blit(cat_head, lt_pos_curr)
-                pygame.display.update()
-                time.sleep(1./2)
-        # time.sleep(1./FPS)
-        # pygame.display.flip()
+                pygame.display.flip()
+                time.sleep(3./FPS)
         return
 
 

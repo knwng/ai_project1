@@ -24,19 +24,29 @@ state = STATE_WELCOME
 
 pygame.display.set_caption('Tom and Jerry')
 startPage = pygame.image.load(startpage_fn)
+winpage = pygame.image.load(catchpage_fn)
+shape = [startPage.get_width(), startPage.get_height()]
+DISPLAYSURF = pygame.display.set_mode((shape[0], shape[1]), SRCALPHA, 32)
+
 start_button_1 = pygame.image.load(start_button_fn[0])
 start_button_height = start_button_1.get_height()
 del start_button_1
-shape = [startPage.get_width(), startPage.get_height()]
-DISPLAYSURF = pygame.display.set_mode((shape[0], shape[1]), SRCALPHA, 32)
+start_button = DynamicButton(start_button_fn[0], start_button_fn[1],
+                             (50, shape[1]-start_button_height-50))
+
 play_button_1 = pygame.image.load(play_button_fn[0])
 play_button_width = play_button_1.get_width()
 del play_button_1
-start_button = DynamicButton(start_button_fn[0], start_button_fn[1],
-                             (50, shape[1]-start_button_height-50))
 play_button = DynamicButton(play_button_fn[0], play_button_fn[1], (shape[0]-play_button_width-50, 50))
 
-winpage = pygame.image.load(catchpage_fn)
+restart_button_1 = pygame.image.load(restart_button_fn[0])
+restart_button_width = restart_button_1.get_width()
+restart_button_height = restart_button_1.get_height()
+del restart_button_1
+# restart_button = DynamicButton(restart_button_fn[0], restart_button_fn[1], (shape[0]-restart_button_width-50,
+#                                                                             shape[1]-restart_button_height-50))
+restart_button = DynamicButton(restart_button_fn[0], restart_button_fn[1], (50, 50))
+
 
 m = 7
 n = 6
@@ -92,7 +102,14 @@ while True:
                 sys.exit()
 
     elif state == STATE_WIN:
-        DISPLAYSURF.blit(winpage, (0, 0))
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.mixer.music.stop()
+                pygame.quit()
+                sys.exit()
+        DISPLAYSURF.fill(WHITE)
+        DISPLAYSURF.blit(winpage, (50, 50))
+        restart_button.display(DISPLAYSURF)
     else:
         pass
     # only draw display surface(which is declared by pygame.display.set_mode()) onto screen
