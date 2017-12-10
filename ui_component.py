@@ -13,7 +13,8 @@ class DynamicButton(object):
         print(position[1], position[1]+self.button_1.get_height())
         return
 
-    def mouse_on_button(self, mouse_pos):
+    def mouse_on_button(self):
+        mouse_pos = pygame.mouse.get_pos()
         width = self.button_1.get_width()
         height = self.button_1.get_height()
 
@@ -23,8 +24,8 @@ class DynamicButton(object):
             return False
         return True
 
-    def display(self, mouse_pos, screen):
-        if self.mouse_on_button(mouse_pos) is True:
+    def display(self, screen):
+        if self.mouse_on_button() is True:
             screen.blit(self.button_2, self.position)
         else:
             screen.blit(self.button_1, self.position)
