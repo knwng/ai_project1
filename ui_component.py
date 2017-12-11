@@ -1,7 +1,7 @@
 import sys
 import pygame
 from pygame.locals import *
-from color_map import *
+from config import *
 
 
 class DynamicButton(object):

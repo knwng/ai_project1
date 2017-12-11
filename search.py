@@ -2,7 +2,7 @@ import numpy as np
 from Queue import PriorityQueue
 import pygame
 import time
-from color_map import *
+from config import *
 import random
 
 FPS = 30
@@ -16,6 +16,10 @@ class Agent(object):
         self.cat_init = puzzle_map.cat_init
         self.mouse_init = puzzle_map.mouse_init
         self.SOLVED = False
+        self.open_list = None
+        self.close_list = None
+        self.path = None
+        self.last_node = None
         return
 
     class NextNode:
@@ -78,24 +82,28 @@ class Agent(object):
 
     def display(self, screen, block_lt_pos, block_shape):
         block = pygame.Surface(block_shape, flags=pygame.SRCALPHA)
-        block.convert_alpha()
+        # block.convert_alpha()
         if self.SOLVED is False:
             block.fill(CORNFLOWERBLUE)
             block.set_alpha(100)
-            lt_pos = [block_lt_pos[0] + self.last_node[0] * block_shape[0], block_lt_pos[1] + self.last_node[1] * block_shape[1]]
+            lt_pos = [block_lt_pos[0] + self.last_node[0] * block_shape[0],
+                      block_lt_pos[1] + self.last_node[1] * block_shape[1]]
             screen.blit(block, lt_pos)
             pygame.display.update()
             time.sleep(1. / FPS)
 
         else:
             block.fill(BLUEVIOLET)
+            block.set_alpha(100)
             cat_head = pygame.transform.scale(pygame.image.load(cat_fn).convert_alpha(), block_shape)
             grass_block = pygame.transform.scale(pygame.image.load(grass_fn).convert_alpha(), block_shape)
             for i in range(len(self.path)):
                 if i == 0:
                     continue
-                lt_pos_post = [block_lt_pos[0] + self.path[i - 1][0] * block_shape[0], block_lt_pos[1] + self.path[i - 1][1] * block_shape[1]]
-                lt_pos_curr = [block_lt_pos[0] + self.path[i][0] * block_shape[0], block_lt_pos[1] + self.path[i][1] * block_shape[1]]
+                lt_pos_post = [block_lt_pos[0] + self.path[i - 1][0] * block_shape[0],
+                               block_lt_pos[1] + self.path[i - 1][1] * block_shape[1]]
+                lt_pos_curr = [block_lt_pos[0] + self.path[i][0] * block_shape[0],
+                               block_lt_pos[1] + self.path[i][1] * block_shape[1]]
                 screen.blit(grass_block, lt_pos_post)
                 screen.blit(block, lt_pos_post)
                 screen.blit(cat_head, lt_pos_curr)
@@ -124,7 +132,10 @@ class PuzzleMap(object):
         self.mouse_head = pygame.transform.scale(self.mouse_head, self.block_shape)
         self.cat_head = pygame.transform.scale(self.cat_head, self.block_shape)
         # self.block_shape = [self.grass_block.get_width(), self.grass_block.get_height()]
-        self.obstacle = list()
+        self.obstacle = None
+        self.puzzle_map = None
+        self.cat_init = None
+        self.mouse_init = None
         return
 
     def map_generator(self):

@@ -7,7 +7,8 @@ pygame.init()
 app = gui.App()
 DISPLAYSURF = pygame.display.set_mode((500, 500))
 
-lo = gui.Container(width=350)
+lo = gui.Container(width=200)
+lo.resize(200, 200)
 e = gui.Button("Hello World")
 
 
@@ -18,9 +19,9 @@ s.add("Dog",'dog')
 s.add("Pig",'pig')
 
 
-lo.add(e, 36, 250)
-lo.add(s, 100, 400)
-app.init(lo)
+lo.add(e, 50, 50)
+lo.add(s, 100, 100)
+app.init(lo, DISPLAYSURF, (100, 100, 300, 300))
 
 
 while True:
