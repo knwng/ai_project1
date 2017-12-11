@@ -37,17 +37,17 @@ class Agent(object):
         self.path = []
         self.open_list.put(self.NextNode(self.cat_init, 0, self.mouse_init))
         parents = {}
-        print('puzzle map: ')
+        # print('puzzle map: ')
         print(self.puzzle_map)
 
         while self.open_list.not_empty:
             pygame.event.pump()
             node = self.open_list.get()
+            if str(node.node) in self.close_list:
+                continue
             self.last_node = node.node
             self.display(screen, block_lt_pos, block_shape)
             if self.puzzle_map[node.node[0], node.node[1]] == -1:
-                # self.last_node = node.node
-                # self.display(screen, block_lt_pos, block_shape)
                 print("catch the mouse!")
                 node_backtrack = node.node
                 self.path.append(node_backtrack)
@@ -55,19 +55,15 @@ class Agent(object):
                     self.path.append(parents[str(node_backtrack)])
                     node_backtrack = parents[str(node_backtrack)]
                 self.path.reverse()
-                # print('path: ', self.path)
                 self.SOLVED = True
-                # time.sleep(1)
                 self.display(screen, block_lt_pos, block_shape)
                 break
             self.close_list[str(node.node)] = node.node
             for i in range(4):
-                # nnode = map(add, node.node, orient[i])
                 nnode = [sum(x) for x in zip(node.node, orient[i])]
                 if self.is_legal(nnode, self.close_list):
                     self.open_list.put(self.NextNode(nnode, node.g + 1, self.mouse_init))
                     parents[str(nnode)] = node.node
-            # time.sleep(1)
         return
 
     def is_legal(self, node, close_list):
@@ -81,12 +77,11 @@ class Agent(object):
         return True
 
     def display(self, screen, block_lt_pos, block_shape):
-        # self.pmap.display(screen)
         block = pygame.Surface(block_shape, flags=pygame.SRCALPHA)
         block.convert_alpha()
         if self.SOLVED is False:
-            # print('close list: ', self.close_list.keys())
             block.fill(CORNFLOWERBLUE)
+            block.set_alpha(100)
             lt_pos = [block_lt_pos[0] + self.last_node[0] * block_shape[0], block_lt_pos[1] + self.last_node[1] * block_shape[1]]
             screen.blit(block, lt_pos)
             pygame.display.update()
@@ -94,18 +89,8 @@ class Agent(object):
 
         else:
             block.fill(BLUEVIOLET)
-            # print("Path: ", self.path)
-            # self.pmap.display(screen)
-            # pygame.event.pump()
-            # for i in self.path:
-            #     lt_pos = [block_lt_pos[0]+i[0]*block_shape[0], block_lt_pos[1]+i[1]*block_shape[1]]
-            #     screen.blit(block, lt_pos)
-            # pygame.display.update()
-            # time.sleep(1)
             cat_head = pygame.transform.scale(pygame.image.load(cat_fn).convert_alpha(), block_shape)
             grass_block = pygame.transform.scale(pygame.image.load(grass_fn).convert_alpha(), block_shape)
-            # grass_block = pygame.transform.scale(grass_block, (cat_head.get_width(), cat_head.get_height()))
-            print('last path: ', self.mouse_init, self.path[-1])
             for i in range(len(self.path)):
                 if i == 0:
                     continue
@@ -117,7 +102,7 @@ class Agent(object):
                 pygame.display.update()
                 pygame.event.pump()
                 time.sleep(3. / FPS)
-            time.sleep(2)
+            time.sleep(1)
         return
 
 
