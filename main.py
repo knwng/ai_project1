@@ -48,8 +48,8 @@ del restart_button_1
 restart_button = DynamicButton(restart_button_fn[0], restart_button_fn[1], (50, 50))
 
 
-m = 18
-n = 16
+m = 30
+n = 30
 
 DISPLAYSURF.blit(startPage, (0, 0))
 # run the game loop

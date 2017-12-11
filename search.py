@@ -55,7 +55,7 @@ class Agent(object):
                     self.path.append(parents[str(node_backtrack)])
                     node_backtrack = parents[str(node_backtrack)]
                 self.path.reverse()
-                print('path: ', self.path)
+                # print('path: ', self.path)
                 self.SOLVED = True
                 # time.sleep(1)
                 self.display(screen, block_lt_pos, block_shape)
@@ -102,11 +102,11 @@ class Agent(object):
             #     screen.blit(block, lt_pos)
             # pygame.display.update()
             # time.sleep(1)
-            cat_head = pygame.image.load(cat_fn).convert_alpha()
-            grass_block = pygame.image.load(grass_fn).convert_alpha()
-            grass_block = pygame.transform.scale(grass_block, (cat_head.get_width(), cat_head.get_height()))
+            cat_head = pygame.transform.scale(pygame.image.load(cat_fn).convert_alpha(), block_shape)
+            grass_block = pygame.transform.scale(pygame.image.load(grass_fn).convert_alpha(), block_shape)
+            # grass_block = pygame.transform.scale(grass_block, (cat_head.get_width(), cat_head.get_height()))
+            print('last path: ', self.mouse_init, self.path[-1])
             for i in range(len(self.path)):
-                pygame.event.pump()
                 if i == 0:
                     continue
                 lt_pos_post = [block_lt_pos[0] + self.path[i - 1][0] * block_shape[0], block_lt_pos[1] + self.path[i - 1][1] * block_shape[1]]
@@ -115,6 +115,7 @@ class Agent(object):
                 screen.blit(block, lt_pos_post)
                 screen.blit(cat_head, lt_pos_curr)
                 pygame.display.update()
+                pygame.event.pump()
                 time.sleep(3. / FPS)
             time.sleep(2)
         return
@@ -127,15 +128,17 @@ class PuzzleMap(object):
         self.grid = grid
         self.level = level
         self.block_lt_pos = [50, 50]
+        self.playground = [720, 640]
         self.cat_head = pygame.image.load(cat_fn).convert_alpha()
         self.mouse_head = pygame.image.load(mouse_fn).convert_alpha()
         self.grass_block = pygame.image.load(grass_fn).convert_alpha()
         self.stone_block = pygame.image.load(stone_fn).convert_alpha()
-        self.grass_block = pygame.transform.scale(self.grass_block,
-                                                  (self.cat_head.get_width(), self.cat_head.get_height()))
-        self.stone_block = pygame.transform.scale(self.stone_block,
-                                                  (self.cat_head.get_width(), self.cat_head.get_height()))
-        self.block_shape = [self.grass_block.get_width(), self.grass_block.get_height()]
+        self.block_shape = [self.playground[0]/self.M, self.playground[1]/self.N]
+        self.grass_block = pygame.transform.scale(self.grass_block, self.block_shape)
+        self.stone_block = pygame.transform.scale(self.stone_block, self.block_shape)
+        self.mouse_head = pygame.transform.scale(self.mouse_head, self.block_shape)
+        self.cat_head = pygame.transform.scale(self.cat_head, self.block_shape)
+        # self.block_shape = [self.grass_block.get_width(), self.grass_block.get_height()]
         self.obstacle = list()
         return
 
@@ -198,4 +201,5 @@ class PuzzleMap(object):
                                     self.block_lt_pos[1] + self.block_shape[1] * self.cat_init[1]))
         screen.blit(self.mouse_head, (self.block_lt_pos[0] + self.block_shape[0] * self.mouse_init[0],
                                       self.block_lt_pos[1] + self.block_shape[1] * self.mouse_init[1]))
+        # pygame.draw.rect(screen, BLACK, (self.block_lt_pos[0], self.block_lt_pos[1], 720, 640), 1)
         return
