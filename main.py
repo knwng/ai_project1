@@ -48,22 +48,14 @@ del restart_button_1
 restart_button = DynamicButton(restart_button_fn[0], restart_button_fn[1], (50, 50))
 
 
-m = 7
-n = 6
-cat_init = [1, 3]
-mouse_init = [5, 2]
-puzzle_map = PuzzleMap(m, n, cat_init, mouse_init, 'square', 1)
-puzzle_map.map_generator()
-agent = Agent(puzzle_map)
+m = 18
+n = 16
 
 DISPLAYSURF.blit(startPage, (0, 0))
 # run the game loop
 while True:
-    # print('state: ', STATE[state])
-    # event = pygame.event.poll()
     if state == STATE_WELCOME:
         DISPLAYSURF.blit(startPage, (0, 0))
-        # mouse_pos = pygame.mouse.get_pos()
         start_button.display(DISPLAYSURF)
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -74,6 +66,8 @@ while True:
                 if start_button.mouse_on_button():
                     DISPLAYSURF.fill(WHITE)
                     pygame.display.flip()
+                    puzzle_map = PuzzleMap(m, n, 'square', 4)
+                    puzzle_map.map_generator()
                     state = STATE_START
     elif state == STATE_START:
         for event in pygame.event.get():
@@ -85,10 +79,10 @@ while True:
                 if play_button.mouse_on_button():
                     DISPLAYSURF.fill(WHITE)
                     pygame.display.flip()
+                    agent = Agent(puzzle_map)
                     state = STATE_SOLVE
                     break
         puzzle_map.display(DISPLAYSURF)
-        # mouse_pos = pygame.mouse.get_pos()
         play_button.display(DISPLAYSURF)
     elif state == STATE_GENERATED:
         pass
@@ -102,17 +96,22 @@ while True:
                 sys.exit()
 
     elif state == STATE_WIN:
+        DISPLAYSURF.fill(WHITE)
+        DISPLAYSURF.blit(winpage, (50, 50))
+        restart_button.display(DISPLAYSURF)
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.mixer.music.stop()
                 pygame.quit()
                 sys.exit()
-        DISPLAYSURF.fill(WHITE)
-        DISPLAYSURF.blit(winpage, (50, 50))
-        restart_button.display(DISPLAYSURF)
+            elif event.type == MOUSEBUTTONDOWN:
+                if restart_button.mouse_on_button():
+                    DISPLAYSURF.fill(WHITE)
+                    pygame.display.flip()
+                    puzzle_map.map_generator()
+                    state = STATE_START
+                    break
     else:
         pass
-    # only draw display surface(which is declared by pygame.display.set_mode()) onto screen
-    # if you want to draw another surface onto screen, use blit
     pygame.display.update()
     fpsClock.tick(FPS)
