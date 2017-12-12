@@ -114,6 +114,112 @@ class Agent(object):
         return
 
 
+class Agentv2(object):
+
+    def __init__(self, puzzle_map):
+        self.pmap = puzzle_map
+        self.puzzle_map = puzzle_map.puzzle_map
+        self.cat_init = puzzle_map.cat_init
+        self.mouse_init = puzzle_map.mouse_init
+        self.SOLVED = False
+        self.open_list = None
+        self.close_list = None
+        self.path = None
+        self.last_node = None
+        return
+
+    class NextNode:
+        def __init__(self, node, g, mouse_init):
+            self.node = node
+            self.g = g
+            h = abs(node[0] - mouse_init[0]) + abs(node[1] - mouse_init[1])
+            self.priority = h + g
+            return
+
+        def __cmp__(self, other):
+            return cmp(self.priority, other.priority)
+
+    def solver(self, screen, block_lt_pos, block_shape):
+        orient = [[0, 1], [1, 0], [0, -1], [-1, 0]]
+        self.open_list = PriorityQueue()
+        self.close_list = {}
+        self.last_node = []
+        self.path = []
+        self.open_list.put(self.NextNode(self.cat_init, 0, self.mouse_init))
+        parents = {}
+        # print('puzzle map: ')
+        print(self.puzzle_map)
+
+        while self.open_list.not_empty:
+            pygame.event.pump()
+            node = self.open_list.get()
+            if str(node.node) in self.close_list:
+                continue
+            self.last_node = node.node
+            self.display(screen, block_lt_pos, block_shape)
+            if self.puzzle_map[node.node[0], node.node[1]] == -1:
+                print("catch the mouse!")
+                node_backtrack = node.node
+                self.path.append(node_backtrack)
+                while str(node_backtrack) in parents:
+                    self.path.append(parents[str(node_backtrack)])
+                    node_backtrack = parents[str(node_backtrack)]
+                self.path.reverse()
+                self.SOLVED = True
+                self.display(screen, block_lt_pos, block_shape)
+                break
+            self.close_list[str(node.node)] = node.node
+            for i in range(4):
+                nnode = [sum(x) for x in zip(node.node, orient[i])]
+                if self.is_legal(nnode, self.close_list):
+                    self.open_list.put(self.NextNode(nnode, node.g + 1, self.mouse_init))
+                    parents[str(nnode)] = node.node
+        return
+
+    def is_legal(self, node, close_list):
+        m, n = self.puzzle_map.shape
+        if node[0] < 0 or node[1] < 0 or node[0] >= m or node[1] >= n:
+            return False
+        if self.puzzle_map[node[0], node[1]] == 1:
+            return False
+        if str(node) in close_list.keys():
+            return False
+        return True
+
+    def display(self, screen, block_lt_pos, block_shape):
+        block = pygame.Surface(block_shape, flags=pygame.SRCALPHA)
+        # block.convert_alpha()
+        if self.SOLVED is False:
+            block.fill(CORNFLOWERBLUE)
+            block.set_alpha(100)
+            lt_pos = [block_lt_pos[0] + self.last_node[0] * block_shape[0],
+                      block_lt_pos[1] + self.last_node[1] * block_shape[1]]
+            screen.blit(block, lt_pos)
+            pygame.display.update()
+            time.sleep(1. / FPS)
+
+        else:
+            block.fill(BLUEVIOLET)
+            block.set_alpha(100)
+            cat_head = pygame.transform.scale(pygame.image.load(cat_fn).convert_alpha(), block_shape)
+            grass_block = pygame.transform.scale(pygame.image.load(grass_fn).convert_alpha(), block_shape)
+            for i in range(len(self.path)):
+                if i == 0:
+                    continue
+                lt_pos_post = [block_lt_pos[0] + self.path[i - 1][0] * block_shape[0],
+                               block_lt_pos[1] + self.path[i - 1][1] * block_shape[1]]
+                lt_pos_curr = [block_lt_pos[0] + self.path[i][0] * block_shape[0],
+                               block_lt_pos[1] + self.path[i][1] * block_shape[1]]
+                screen.blit(grass_block, lt_pos_post)
+                screen.blit(block, lt_pos_post)
+                screen.blit(cat_head, lt_pos_curr)
+                pygame.display.update()
+                pygame.event.pump()
+                time.sleep(3. / FPS)
+            time.sleep(1)
+        return
+
+
 class PuzzleMap(object):
     def __init__(self, M, N, grid, level):
         self.M = M
