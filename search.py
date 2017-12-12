@@ -126,6 +126,7 @@ class Agentv2(object):
         self.close_list = None
         self.path = None
         self.last_node = None
+        self.last_jerry = self.mouse_init
         return
 
     class NextNode:
@@ -141,6 +142,7 @@ class Agentv2(object):
 
     def solver(self, screen, block_lt_pos, block_shape):
         orient = [[0, 1], [1, 0], [0, -1], [-1, 0]]
+        orient_jerry = [[0, 1], [1, 0], [0, -1], [-1, 0]]
         self.open_list = PriorityQueue()
         self.close_list = {}
         self.last_node = []
@@ -171,18 +173,48 @@ class Agentv2(object):
             self.close_list[str(node.node)] = node.node
             for i in range(4):
                 nnode = [sum(x) for x in zip(node.node, orient[i])]
-                if self.is_legal(nnode, self.close_list):
+                if self.is_legal(nnode) and not str(node) in self.close_list.keys():
                     self.open_list.put(self.NextNode(nnode, node.g + 1, self.mouse_init))
                     parents[str(nnode)] = node.node
+
+            pygame.event.pump()
+            node = self.open_list.get()
+            if str(node.node) in self.close_list:
+                continue
+            self.last_node = node.node
+            self.display(screen, block_lt_pos, block_shape)
+            if self.puzzle_map[node.node[0], node.node[1]] == -1:
+                print("catch the mouse!")
+                node_backtrack = node.node
+                self.path.append(node_backtrack)
+                while str(node_backtrack) in parents:
+                    self.path.append(parents[str(node_backtrack)])
+                    node_backtrack = parents[str(node_backtrack)]
+                self.path.reverse()
+                self.SOLVED = True
+                self.display(screen, block_lt_pos, block_shape)
+                break
+            self.close_list[str(node.node)] = node.node
+            for i in range(4):
+                nnode = [sum(x) for x in zip(node.node, orient[i])]
+                if self.is_legal(nnode) and not str(node) in self.close_list.keys():
+                    self.open_list.put(self.NextNode(nnode, node.g + 1, self.mouse_init))
+                    parents[str(nnode)] = node.node
+
+            pygame.event.pump()
+            random.shuffle(orient_jerry)
+            for i in range(4):
+                nnode = [sum(x) for x in zip(self.mouse_init, orient_jerry[i])]
+                if self.is_legal(nnode):
+                    self.last_jerry = self.mouse_init
+                    self.mouse_init = nnode
         return
 
-    def is_legal(self, node, close_list):
+    def is_legal(self, node):
         m, n = self.puzzle_map.shape
         if node[0] < 0 or node[1] < 0 or node[0] >= m or node[1] >= n:
             return False
         if self.puzzle_map[node[0], node[1]] == 1:
-            return False
-        if str(node) in close_list.keys():
             return False
         return True
 
@@ -192,9 +224,19 @@ class Agentv2(object):
         if self.SOLVED is False:
             block.fill(CORNFLOWERBLUE)
             block.set_alpha(100)
+            mouse_head = pygame.transform.scale(pygame.image.load(mouse_fn).convert_alpha(), block_shape)
+            grass_block = pygame.transform.scale(pygame.image.load(grass_fn).convert_alpha(), block_shape)
             lt_pos = [block_lt_pos[0] + self.last_node[0] * block_shape[0],
                       block_lt_pos[1] + self.last_node[1] * block_shape[1]]
             screen.blit(block, lt_pos)
+            jerry_pos_post = [block_lt_pos[0] + self.last_jerry[0]*block_shape[0],
+                              block_lt_pos[1] + self.last_jerry[1]*block_shape[1]]
+            jerry_pos_curr = [block_lt_pos[0] + self.mouse_init[0]*block_shape[0],
+                              block_lt_pos[1] + self.mouse_init[1]*block_shape[1]]
+            screen.blit(mouse_head, jerry_pos_curr)
+            screen.blit(grass_block, jerry_pos_post)
+            if str(jerry_pos_post) in self.close_list.keys():
+                screen.blit(block, jerry_pos_post)
             pygame.display.update()
             time.sleep(1. / FPS)
 
