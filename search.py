@@ -149,10 +149,10 @@ class Agentv2(object):
         self.path = []
         self.open_list.put(self.NextNode(self.cat_init, 0, self.mouse_init))
         parents = {}
-        # print('puzzle map: ')
-        print(self.puzzle_map)
 
         while self.open_list.not_empty:
+            print('puzzle map: ')
+            print(self.puzzle_map)
             pygame.event.pump()
             node = self.open_list.get()
             if str(node.node) in self.close_list:
@@ -173,7 +173,7 @@ class Agentv2(object):
             self.close_list[str(node.node)] = node.node
             for i in range(4):
                 nnode = [sum(x) for x in zip(node.node, orient[i])]
-                if self.is_legal(nnode) and not str(node) in self.close_list.keys():
+                if self.is_legal(nnode) and str(node) not in self.close_list.keys():
                     self.open_list.put(self.NextNode(nnode, node.g + 1, self.mouse_init))
                     parents[str(nnode)] = node.node
 
@@ -197,7 +197,7 @@ class Agentv2(object):
             self.close_list[str(node.node)] = node.node
             for i in range(4):
                 nnode = [sum(x) for x in zip(node.node, orient[i])]
-                if self.is_legal(nnode) and not str(node) in self.close_list.keys():
+                if self.is_legal(nnode) and str(node) not in self.close_list.keys():
                     self.open_list.put(self.NextNode(nnode, node.g + 1, self.mouse_init))
                     parents[str(nnode)] = node.node
 
@@ -208,6 +208,8 @@ class Agentv2(object):
                 if self.is_legal(nnode):
                     self.last_jerry = self.mouse_init
                     self.mouse_init = nnode
+                    self.puzzle_map[self.mouse_init[0], self.mouse_init[1]] = -1
+                    self.puzzle_map[self.last_jerry[0], self.last_jerry[1]] = 0
         return
 
     def is_legal(self, node):

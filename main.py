@@ -119,8 +119,8 @@ def main():
                     if play_button.mouse_on_button():
                         DISPLAYSURF.fill(WHITE)
                         pygame.display.flip()
-                        # agent = Agent(puzzle_map)
-                        agent = Agentv2(puzzle_map)
+                        agent = Agent(puzzle_map)
+                        # agent = Agentv2(puzzle_map)
                         state = STATE_SOLVE
                         break
                     elif generate_button.mouse_on_button():
